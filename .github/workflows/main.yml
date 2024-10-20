@@ -1,0 +1,49 @@
+name: Main
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+        inputs:
+            workflow_title:
+                description: 'Title for workflow'
+                required: false
+                default: 'Main Workflow'
+
+run-name: ${{ inputs.workflow_title }}
+
+jobs:
+    lint:
+        uses: ./.github/workflows/_lint.yml
+        secrets: inherit
+
+    unittest:
+        uses: ./.github/workflows/_unittest.yml
+        secrets: inherit
+        needs: [lint]
+
+    deploy:
+        uses: ./.github/workflows/_deploy.yml
+        secrets: inherit
+        needs: [unittest]
+
+    e2e:
+        uses: ./.github/workflows/_e2e.yml
+        secrets: inherit
+        needs: [deploy]
+        with:
+            base-url: ${{ needs.deploy.outputs.app_url }}
+
+    tag_stable:
+        uses: './.github/workflows/_tag_stable.yml'
+        needs: [e2e]
+        if: success() && (github.event_name != 'pull_request' || github.event_name != 'workflow_dispatch')
+
+    rollback:
+        uses: './.github/workflows/_rollback.yml'
+        needs: [e2e]
+        if: failure()

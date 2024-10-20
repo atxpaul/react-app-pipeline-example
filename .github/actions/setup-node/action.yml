@@ -1,0 +1,41 @@
+name: setup-nodejs
+description: sets up nodejs
+
+inputs:
+  node-version:
+    description: 'Node version to set up'
+    required: false
+    default: '20.12'
+
+  environment:
+    description: 'Environment for installing dependencies'
+    required: false
+    default: 'dev'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Nodejs ${{ inputs.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install dependencies (requirements)
+      if: ${{ inputs.environment == 'prod' }}
+      run: |
+        npm ci --only=production
+      shell: bash
+
+    - name: Install dependencies (requirements-dev)
+      if: ${{ inputs.environment == 'dev' }}
+      run: |
+        npm ci
+      shell: bash

@@ -1,0 +1,18 @@
+on:
+    workflow_call:
+
+jobs:
+    rollback:
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v4
+            - name: Rollback to Last Stable Version
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Rolling back to last stable version..."
+                  git fetch --tags
+                  last_stable=$(git tag --list "stable-*" --sort=-creatordate | head -n 1)
+                  echo "Deploying $last_stable"
+
+                  gh workflow run main.yml --ref $last_stable --field workflow_title="Rollback to last stable $last_stable"

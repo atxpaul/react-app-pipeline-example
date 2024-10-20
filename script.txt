@@ -1,0 +1,19 @@
+npm create vite@latest . -- --template react
+npm install
+explicar staticwebapp.config.json
+
+
+¿Estás harto de que te hagan la típica broma de que "solo cambiaste el color de un botón"? 🙄
+¿O quizás estás dando tus primeros pasos en el mundo del DevOps y sueñas con crear una pipeline tan sólida que deje a todos sin palabras? 🤯
+
+Bueno, ¡hoy es tu día! 😎
+Porque vamos a crear una pipeline para una aplicación React y... ¡LA VAMOS A DESPLEGAR! 🚀
+
+Aquí es donde debería sonar una intro épica 🎸
+
+Si eres frontend, probablemente estés acostumbrado a desplegar tus proyectos personales en sitios como Vercel o Netlify (y sí, son opciones geniales). Pero cuando hablamos de movernos en entornos empresariales... ahí la cosa cambia. Aquí entra la nube en juego, y seguramente trabajarás con gigantes como AWS o Azure. Hoy te voy a enseñar una forma de hacerlo en Azure, ¡y lo mejor es que es gratis! 💸
+
+Pero espera... ¡aún hay más! 🕺
+Si te quedas hasta el final, vamos a configurar todo para que, si algo sale mal en tu despliegue (es decir, si tu aplicación falla después de subirla), hagamos un rollback automáticamente a la última versión estable. Y lo vamos a hacer usando tests end-to-end (e2e), como los pros. 🤖
+
+Así que hoy, aquí en PanDevOps, vamos a hablar de Frontend, Pipelines, y cómo hacer que tu sitio web siempre esté al 100%. ¡No te lo pierdas! 💥

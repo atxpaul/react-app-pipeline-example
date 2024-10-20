@@ -1,0 +1,64 @@
+on:
+    workflow_call:
+
+jobs:
+    unittest:
+        runs-on: ubuntu-22.04
+        permissions:
+            contents: read
+            pull-requests: write
+            issues: write
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Nodejs
+              uses: ./.github/actions/setup-node
+              with:
+                  node-version: '20.x'
+                  environment: 'dev'
+
+            - name: Test with jest and coverage
+              run: |
+                  npm test > coverage.txt
+
+            - name: Capture coverage report
+              id: get_coverage
+              run: |
+                  echo "coverage<<EOF" >> $GITHUB_OUTPUT
+                  cat coverage.txt >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
+
+            - name: Add coverage report to summary
+              run: |
+                  echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+                  echo '```' >> $GITHUB_STEP_SUMMARY
+                  cat coverage.txt >> $GITHUB_STEP_SUMMARY
+                  echo '```' >> $GITHUB_STEP_SUMMARY
+
+            - name: Create or update PR comment with coverage report
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: peter-evans/create-or-update-comment@v3
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      ## Coverage Report
+                      ```
+                      ${{ steps.get_coverage.outputs.coverage }}
+                      ```
+
+            - name: Fail if coverage is below threshold
+              run: |
+                  grep "All files" coverage.txt
+                  coverage_result=$(grep "All files" coverage.txt | cut -d '|' -f 2 | sed 's/%//;s/ //g')
+                  if [[ -z "$coverage_result" ]]; then
+                    echo "Error: Could not extract coverage percentage."
+                    cat coverage.txt
+                    exit 1
+                  fi
+                  echo "Coverage: $coverage_result%"
+                  if (( $(echo "$coverage_result < 70" | bc -l) )); then
+                    echo "Coverage is below 70%. Failing the pipeline."
+                    exit 1
+                  fi

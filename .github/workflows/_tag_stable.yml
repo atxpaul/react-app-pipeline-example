@@ -1,0 +1,13 @@
+on:
+    workflow_call:
+
+jobs:
+    tag_stable:
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v4
+            - name: Creating stable tag as it is correctly deployed
+              run: |
+                  tag_name="stable-$(date +'%Y%m%d%H%M%S')"
+                  git tag $tag_name
+                  git push origin $tag_name
