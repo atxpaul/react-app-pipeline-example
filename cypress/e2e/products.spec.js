@@ -32,7 +32,7 @@ describe('Products component smoke test', () => {
     it('Should clear the products and details when clear button is clicked', () => {
         cy.get('button.clear-button').click();
 
-        cy.get('table.products-table').should('exist');
+        cy.get('table.products-table').should('not.exist');
         cy.get('div.product-detail').should('not.exist');
     });
 });
