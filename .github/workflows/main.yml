@@ -46,4 +46,4 @@ jobs:
     rollback:
         uses: './.github/workflows/_rollback.yml'
         needs: [e2e]
-        if: failure()
+        if: failure() && github.event_name != 'pull_request'
